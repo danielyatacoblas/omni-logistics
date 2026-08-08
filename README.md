@@ -81,17 +81,17 @@ semana nadie mira.
 
 <!-- MODELOS:inicio -->
 
-### Los modelos, medidos
+### Qué tan bien detecta cada modelo
 
-| Modelo | Para qué | Entrada | Precisión | Recall | mAP@50 | mAP@50-95 |
+| Modelo | Para qué | Precisión | Recall | mAP@50 | mAP@50-95 | La cifra sale de |
 |---|---|---|---|---|---|---|
-| **`pallet_n_640.pt`** | Pallets | 640² | 65.8 % | 61.4 % | 67.4 % | 57.1 % |
-| **`forklift_kerem.pt`** | Montacargas y personas | 640² | — | — | — | — |
-| **`fire_smoke.pt`** | Fuego y humo | 640² | 77.5 % | 69.5 % | 76.5 % | 44.5 % |
-| **`ppe_vest.pt`** | Chaleco y casco | 640² | — | — | — | — |
-| **`yolo11n.pt`** | Base genérica | 640² | 65.6 % | 50.2 % | 55.1 % | 39.4 % |
+| **`pallet_n_640.pt`** | Pallets | 65.8 % | 61.4 % | 67.4 % | 57.1 % | el propio `.pt` |
+| **`forklift_kerem.pt`** | Montacargas y personas | — | — | 84.6 % | — | [su documentación](https://huggingface.co/keremberke/yolov8m-forklift-detection)<br><sub>2 clases: montacargas y persona</sub> |
+| **`fire_smoke.pt`** | Fuego y humo | 77.5 % | 69.5 % | 76.5 % | 44.5 % | el propio `.pt` |
+| **`ppe_vest.pt`** | Chaleco y casco | — | — | — | — | **no publicado** |
+| **`yolo11n.pt`** | Base genérica | 65.6 % | 50.2 % | 55.1 % | 39.4 % | el propio `.pt` |
 
-<sub>Estas cuatro columnas **no** se calculan aquí: salen del propio archivo `.pt`, donde Ultralytics guarda la validación del entrenamiento que produjo esos pesos. Son el acierto sobre el conjunto de validación de quien lo entrenó, **no** sobre los videos de este proyecto. Medir eso exigiría etiquetar a mano esta operación concreta, que es trabajo que un MVP todavía no ha hecho; dar un porcentaje inventado sería peor que no darlo. Comprobación de que la lectura es correcta: `yolo11n` sale con mAP@50-95 = 39,4 % y Ultralytics publica 39,5 % para ese modelo en COCO.</sub>
+<sub>Ninguna de estas cifras se calcula aquí, y la última columna dice cuál es cuál. <b>El propio <code>.pt</code></b>: Ultralytics guardó dentro del archivo la validación del entrenamiento que lo produjo, así que es el acierto que midió quien lo entrenó sobre <i>su</i> conjunto. <b>Su documentación</b>: ese archivo no guardó métricas, y se cita lo que publica su autor con enlace para comprobarlo. <b>No publicado</b>: no hay cifra en ninguna parte, y se dice en vez de rellenar el hueco.<br>En los tres casos son cifras sobre el conjunto de validación de quien entrenó, <b>no</b> sobre los videos de este proyecto. Medir eso exigiría etiquetar a mano esta operación concreta, que es trabajo que un MVP todavía no ha hecho; un porcentaje inventado sería peor que ninguno. Comprobación de que la lectura del <code>.pt</code> es correcta: <code>yolo11n</code> sale con mAP@50-95 = 39,4 % y Ultralytics publica 39,5 % para ese modelo en COCO.</sub>
 
 ### De dónde sale cada modelo
 
@@ -103,17 +103,31 @@ semana nadie mira.
 | **`ppe_vest.pt`** | `ppe_data` | 100 | 640×640 | Detector de EPP de terceros |
 | **`yolo11n.pt`** | `coco` | 600 | 640×640 | [Ultralytics · COCO 2017](https://docs.ultralytics.com/models/yolo11/) |
 
-<sub>El conjunto, las épocas y la resolución salen de `train_args`, que Ultralytics guarda dentro del propio `.pt`. Es decir: no es lo que dice la documentación del modelo, es lo que quedó grabado en el archivo que este repositorio usa de verdad. Los nombres de conjunto son los del disco de quien entrenó —`retrain_data`, `safe_human`— porque es literalmente lo que hay dentro.</sub>
+<sub>El conjunto, las épocas y la resolución salen de <code>train_args</code>, que Ultralytics guarda dentro del propio <code>.pt</code>. Es decir: no es lo que dice la ficha del modelo, es lo que quedó grabado en el archivo que este repositorio carga de verdad. Los nombres de conjunto son los del disco de quien entrenó —<code>retrain_data</code>, <code>safe_human</code>— porque es literalmente lo que hay dentro.</sub>
 
-| Modelo | Parámetros | Clases | Latencia (mejor) | Latencia (mediana) | Det./fotograma | Confianza media |
-|---|---|---|---|---|---|---|
-| **`pallet_n_640.pt`** | 2.6 M | 1 | 14.8 ms · 68 fps | 17.6 ms · 56.7 fps | 0.3 | 0.453 |
-| **`forklift_kerem.pt`** | 25.9 M | 2 | 16.5 ms · 61 fps | 19.7 ms · 50.7 fps | 4.5 | 0.681 |
-| **`fire_smoke.pt`** | 3.0 M | 2 | 27.9 ms · 36 fps | 40.1 ms · 24.9 fps | 1.2 | 0.54 |
-| **`ppe_vest.pt`** | 3.0 M | 10 | 24.8 ms · 40 fps | 37.5 ms · 26.6 fps | 1.4 | 0.585 |
-| **`yolo11n.pt`** | 2.6 M | 80 | 15.7 ms · 64 fps | 18.5 ms · 54.2 fps | 0.9 | 0.482 |
+### Cuánto tarda cada uno, medido aquí
 
-<sub>Esto sí se mide aquí, con <a href="scripts/medir_modelos.py"><code>scripts/medir_modelos.py</code></a>, sobre fotogramas reales de los videos del repositorio, en una RTX 3060 Laptop y a la resolución que usa la aplicación. Sesenta fotogramas, descartando los veinte primeros.<br>Se dan <b>dos</b> latencias a propósito. Esta GPU está a 210 MHz en reposo y tarda segundos en subir de reloj, así que la mediana se mueve bastante entre pasadas —el mismo <code>yolo11n</code> ha dado 20 y 48 fps— mientras que el mejor caso es estable y representa lo que la máquina puede sostener. Dar solo la cifra buena sería vender de más; dar solo la mediana, castigar al modelo por la gestión de energía del portátil.</sub>
+| Modelo | Parámetros | Clases | Latencia (mejor) | Latencia (mediana) | Umbral | Det./fotograma | Confianza media |
+|---|---|---|---|---|---|---|---|
+| **`pallet_n_640.pt`** | 2.6 M | 1 | 37.3 ms · 27 fps | 47.1 ms · 21.2 fps | `0.35` | 0.3 | 0.453 |
+| **`forklift_kerem.pt`** | 25.9 M | 2 | 48.7 ms · 21 fps | 61.6 ms · 16.2 fps | `0.35` | 4.5 | 0.681 |
+| **`fire_smoke.pt`** | 3.0 M | 2 | 35.0 ms · 29 fps | 44.4 ms · 22.5 fps | `0.35` | 1.2 | 0.54 |
+| **`ppe_vest.pt`** | 3.0 M | 10 | 30.3 ms · 33 fps | 41.7 ms · 24.0 fps | `0.35` | 1.4 | 0.585 |
+| **`yolo11n.pt`** | 2.6 M | 80 | 39.0 ms · 26 fps | 46.3 ms · 21.6 fps | `0.35` | 0.9 | 0.482 |
+
+<sub>Esto sí se mide aquí, con <a href="scripts/medir_modelos.py"><code>scripts/medir_modelos.py</code></a>, sobre fotogramas reales de los videos del repositorio, en una RTX 3060 Laptop y a la resolución que usa la aplicación. Sesenta fotogramas, descartando los veinte primeros. El umbral es el que usa la aplicación, y va en la tabla porque «det./fotograma» no significa nada sin él: el mismo modelo a 0.05 y a 0.50 devuelve cantidades incomparables. «Confianza media» es la media de la puntuación de lo que pasó ese umbral — no es acierto, pero dice si el modelo trabaja cómodo o al límite en este material.<br>Se dan <b>dos</b> latencias a propósito. Esta GPU está a 210 MHz en reposo y tarda segundos en subir de reloj, así que la mediana se mueve bastante entre pasadas —el mismo <code>yolo11n</code> ha dado 20 y 48 fps— mientras que el mejor caso es estable y representa lo que la máquina puede sostener. Dar solo la cifra buena sería vender de más; dar solo la mediana, castigar al modelo por la gestión de energía del portátil.</sub>
+
+### Los umbrales que usa este proyecto
+
+Una cifra de mAP sin el umbral al que se trabaja no dice nada: el mismo modelo a 0.05 y a 0.50 se comporta como dos modelos distintos. Estos son los valores por defecto, todos cambiables por variable de entorno sin tocar código.
+
+| Umbral | Valor | Por qué ese y no otro |
+|---|---|---|
+| Confianza · general | **`0.35`** | Pallets y montacargas son objetos grandes y con forma clara; no hace falta bajarlo más. |
+| Confianza · fuego y humo | **`0.50`** | El más alto de todos, y encima con comprobación de brillo. Un falso incendio al día y en una semana nadie mira la alarma. |
+| Confianza · EPP | **`0.40`** | Chaleco y casco son pequeños en una toma de almacén; un poco por encima del general para no marcar infracciones que no existen. |
+| IoU de NMS | **`0.60`** | Los pallets apilados se solapan mucho entre sí; más bajo los fundiría en uno solo y la ocupación saldría a la mitad. |
+| Activación de ByteTrack | **`0.25`** | Un montacargas se tapa detrás de un rack constantemente. |
 
 <!-- MODELOS:fin -->
 
