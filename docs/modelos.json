@@ -21,11 +21,11 @@
     "video": "almacen_racks_720.mp4",
     "res": 640,
     "dispositivo": "cuda",
-    "ms": 17.6,
-    "fps": 56.7,
+    "ms": 47.1,
+    "fps": 21.2,
     "dets": 0.3,
     "conf_media": 0.453,
-    "mejor_ms": 14.8,
+    "mejor_ms": 37.3,
     "fuente": [
       "YOLO11n afinado con pallets de madera",
       null
@@ -49,11 +49,11 @@
     "video": "forklift_almacen_720.mp4",
     "res": 640,
     "dispositivo": "cuda",
-    "ms": 19.7,
-    "fps": 50.7,
+    "ms": 61.6,
+    "fps": 16.2,
     "dets": 4.5,
     "conf_media": 0.681,
-    "mejor_ms": 16.5,
+    "mejor_ms": 48.7,
     "fuente": [
       "keremberke · forklift",
       "https://huggingface.co/keremberke/yolov8m-forklift-detection"
@@ -82,11 +82,11 @@
     "video": "fuego_test.mp4",
     "res": 640,
     "dispositivo": "cuda",
-    "ms": 40.1,
-    "fps": 24.9,
+    "ms": 44.4,
+    "fps": 22.5,
     "dets": 1.2,
     "conf_media": 0.54,
-    "mejor_ms": 27.9,
+    "mejor_ms": 35.0,
     "fuente": [
       "YOLOv8n afinado con fuego y humo",
       null
@@ -116,11 +116,11 @@
     "video": "forklift_almacen_720.mp4",
     "res": 640,
     "dispositivo": "cuda",
-    "ms": 37.5,
-    "fps": 26.6,
+    "ms": 41.7,
+    "fps": 24.0,
     "dets": 1.4,
     "conf_media": 0.585,
-    "mejor_ms": 24.8,
+    "mejor_ms": 30.3,
     "fuente": [
       "Detector de EPP de terceros",
       null
@@ -155,11 +155,11 @@
     "video": "almacen_racks_720.mp4",
     "res": 640,
     "dispositivo": "cuda",
-    "ms": 18.5,
-    "fps": 54.2,
+    "ms": 46.3,
+    "fps": 21.6,
     "dets": 0.9,
     "conf_media": 0.482,
-    "mejor_ms": 15.7,
+    "mejor_ms": 39.0,
     "fuente": [
       "Ultralytics · COCO 2017",
       "https://docs.ultralytics.com/models/yolo11/"
