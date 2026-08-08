@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OMNI Logística — ApexCorp</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- RAIL de módulos (izquierda) -->
+    <nav class="rail" id="rail">
+      <div class="rail-logo">A<span>◢</span></div>
+      <button class="rail-btn active" data-uc="ocupacion"><span class="rn">01</span><span class="ri"><i data-ico="package"></i></span><span class="rl">Ocupación</span></button>
+      <button class="rail-btn" data-uc="muelle"><span class="rn">02</span><span class="ri"><i data-ico="dock"></i></span><span class="rl">Muelle</span></button>
+      <button class="rail-btn" data-uc="seguridad"><span class="rn">03</span><span class="ri"><i data-ico="shield"></i></span><span class="rl">Seguridad</span></button>
+      <button class="rail-btn" data-uc="trazabilidad"><span class="rn">04</span><span class="ri"><i data-ico="route"></i></span><span class="rl">Rutas</span></button>
+      <div class="rail-spacer"></div>
+      <div class="rail-dot"></div>
+    </nav>
+
+    <div class="main">
+      <!-- HEADER -->
+      <header class="hdr">
+        <div class="hdr-l">
+          <div class="h-title">OMNI&nbsp;Logística <span class="ver">MVP</span></div>
+          <div class="h-sub">ApexCorp&nbsp;S.A.C. · Visión por IA en el borde para almacén y muelle</div>
+        </div>
+        <div class="hdr-r">
+          <span class="pill live"><span id="liveDot" class="dot"></span><span id="liveTxt">En espera</span></span>
+          <span class="pill"><i data-ico="cpu"></i><span id="devicePill">—</span></span>
+          <span class="pill"><i data-ico="clock"></i><span id="clock">—</span></span>
+        </div>
+      </header>
+
+      <!-- WORKSPACE:
+           [gauge  ][video][apartado]
+           [alertas][video][apartado]
+           [gráfica][panel][objetos ]  -->
+      <div class="work">
+
+        <!-- GAUGE (izquierda arriba) -->
+        <aside class="gaugecol">
+          <div class="gauge-card fade">
+            <div class="gauge">
+              <svg viewBox="0 0 120 120">
+                <circle class="g-track" cx="60" cy="60" r="52"></circle>
+                <circle class="g-prog" id="gaugeProg" cx="60" cy="60" r="52"
+                        stroke="#8FCE1E" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
+              </svg>
+              <div class="g-mid"><div class="g-val" id="gaugeVal">0</div><div class="g-unit" id="gaugeUnit">%</div></div>
+            </div>
+            <div class="gauge-info">
+              <div class="g-lbl" id="gaugeLbl">Ocupación media</div>
+              <div class="g-sub" id="gaugeSub">Sin datos aún</div>
+            </div>
+          </div>
+          <div class="tiles">
+            <div class="tile accent"><div class="tv" id="tA">0</div><div class="tl" id="tAl">—</div></div>
+            <div class="tile"><div class="tv" id="tB">0</div><div class="tl" id="tBl">—</div></div>
+            <div class="tile"><div class="tv" id="tC">0</div><div class="tl" id="tCl">—</div></div>
+          </div>
+        </aside>
+
+        <!-- ALERTAS (izquierda abajo) -->
+        <aside class="alertscol">
+          <div class="card alerts" id="alertsCard">
+            <div class="a-hd">
+              <div class="a-t"><i data-ico="alert"></i>Alertas <span id="alertCount" class="badge-n">0</span></div>
+              <button id="exportBtn" class="btn ghost sm"><i data-ico="download"></i>CSV</button>
+            </div>
+            <div id="alertRows" class="alert-list"></div>
+            <div id="noAlerts" class="empty-box">Sin alertas todavía.</div>
+          </div>
+        </aside>
+
+        <!-- STAGE: video (centro, filas 1-2) -->
+        <section class="stage">
+          <div class="viewport" id="viewport">
+            <img id="frameImg" class="layer" alt="frame" />
+            <img id="stream" class="layer" alt="stream" style="display:none" />
+            <canvas id="editor" class="layer editor"></canvas>
+            <div class="stage-badges">
+              <span class="sbadge"><i data-ico="cpu"></i><span id="stageModule">Ocupación por zona</span></span>
+              <span class="sbadge live" id="stageLive" style="display:none"><span class="rdot"></span>EN VIVO</span>
+            </div>
+            <div class="stage-fps" id="stageFps" style="display:none">0 fps</div>
+            <div id="hint" class="draw-hint" style="display:none"></div>
+            <div id="placeholder" class="placeholder">
+              <i data-ico="mouse-pointer"></i>
+              <div>Elige un video y define tu <b id="phCfg">zona de almacenaje</b></div>
+            </div>
+            <div id="procOverlay" class="proc-overlay" style="display:none">
+              <div class="spin"></div>
+              <span id="procTxt">Cargando modelos…</span>
+              <small id="procModels">modelos del apartado · unos segundos</small>
+            </div>
+            <!-- ALARMA DE INCENDIO -->
+            <div id="fireBanner" class="fire-banner" style="display:none">
+              <span class="fb-ico"><i data-ico="flame"></i></span>
+              <div class="fb-tx">
+                <b>ALERTA DE INCENDIO</b>
+                <span id="fireWhere">Fuego detectado en la escena</span>
+              </div>
+              <span class="fb-n" id="fireCount">1</span>
+            </div>
+          </div>
+
+          <div class="tools">
+            <div class="select-wrap"><i data-ico="film"></i>
+              <select id="videoSelect" class="sel"></select>
+            </div>
+            <button id="drawBtn" class="btn tool"><i data-ico="scan"></i><span id="drawLbl">Dibujar zona</span></button>
+            <button id="undoBtn" class="btn tool icon-only" title="Deshacer"><i data-ico="undo"></i></button>
+            <button id="clearBtn" class="btn tool icon-only" title="Borrar configuración"><i data-ico="trash"></i></button>
+            <div class="cfg-wrap">
+              <button id="cfgBtn" class="btn tool icon-only" title="Gráficas visibles"><i data-ico="settings"></i></button>
+              <div id="cfgPop" class="cfg-pop" style="display:none">
+                <div class="cfg-t"><i data-ico="chart"></i>Gráficas visibles</div>
+                <div id="cfgCharts" class="cfg-list"></div>
+                <div class="cfg-note">los modelos se activan en la tarjeta "Modelos"</div>
+              </div>
+            </div>
+            <div class="tb-spacer"></div>
+            <button id="startBtn" class="btn primary"><i data-ico="play"></i>Procesar</button>
+            <button id="stopBtn" class="btn ghost" disabled><i data-ico="stop"></i>Detener</button>
+          </div>
+          <div class="progress"><div id="progressBar"></div></div>
+          <div class="chips">
+            <span class="lbl"><i data-ico="layers"></i>Config</span>
+            <span id="zoneChips"></span>
+            <span id="noZones" class="empty">nada definido — usa “Dibujar”</span>
+          </div>
+        </section>
+
+        <!-- SIDECOL: apartado + modelos (derecha, filas 1-2) -->
+        <aside class="sidecol">
+          <div class="side-head">
+            <div class="kick">Analítica</div>
+            <h2 id="ucTitle">Ocupación por zona</h2>
+          </div>
+          <div class="card" id="modelsCard">
+            <div class="card-t"><i data-ico="cpu"></i>Modelos
+              <span class="mrun" id="modelsState">apagados</span></div>
+            <div id="modelChips" class="model-chips"></div>
+          </div>
+          <!-- INCENDIO (solo apartado seguridad) -->
+          <div class="card" id="fireCard" style="display:none">
+            <div class="card-t"><i data-ico="flame" class="t-red"></i>Incendio</div>
+            <div id="fireBox" class="riskbox">
+              <div class="risk-dot" id="fireDot"></div>
+              <div><div class="risk-lbl" id="fireLbl">Sin fuego ni humo</div><div class="risk-sub" id="fireSub">monitoreo continuo</div></div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ABAJO IZQUIERDA: gráfica del apartado -->
+        <section class="chartcol">
+          <div class="card chartcard" id="chartCard">
+            <div class="card-t"><i data-ico="activity"></i><span id="chartTitle">Actividad durante el video</span>
+              <span class="legend inline" id="chartLegend"></span></div>
+            <div class="chart-wrap"><canvas id="flowChart"></canvas></div>
+          </div>
+        </section>
+
+        <!-- ABAJO CENTRO: panel puntual del apartado -->
+        <section class="panelcol">
+          <div class="card bcard mod-panel" data-mod="ocupacion">
+            <div class="card-t"><i data-ico="package"></i>Llenado por zona</div>
+            <div id="occBars" class="bars"></div>
+          </div>
+          <div class="card bcard mod-panel" data-mod="muelle" style="display:none">
+            <div class="card-t"><i data-ico="dock"></i>Cruces del muelle</div>
+            <div class="io-row">
+              <div class="io in"><span>Cargado</span><b id="ioIn">0</b></div>
+              <div class="io out"><span>Descargado</span><b id="ioOut">0</b></div>
+              <div class="io peak"><span>Piezas/min</span><b id="ioThr">0</b></div>
+            </div>
+          </div>
+          <div class="card bcard mod-panel" data-mod="seguridad" style="display:none">
+            <div class="card-t"><i data-ico="shield"></i>Estado de riesgo</div>
+            <div class="sec-grid">
+              <div id="riskBox" class="riskbox">
+                <div class="risk-dot" id="riskDot"></div>
+                <div><div class="risk-lbl" id="riskLbl">Sin riesgo</div><div class="risk-sub" id="riskSub">distancia mínima —</div></div>
+              </div>
+              <div class="io-row">
+                <div class="io out"><span><i data-ico="user" class="io-ic"></i> Caídas</span><b id="secFalls">0</b></div>
+                <div class="io peak"><span><i data-ico="zap" class="io-ic"></i> Velocidad</span><b id="secSpeed">0</b></div>
+                <div class="io in"><span><i data-ico="cone" class="io-ic"></i> Obstrucción</span><b id="secObs">0</b></div>
+              </div>
+            </div>
+            <div id="aisleList" class="rows"></div>
+          </div>
+          <div class="card bcard mod-panel" data-mod="trazabilidad" style="display:none">
+            <div class="card-t"><i data-ico="timer"></i>Permanencia por zona</div>
+            <div id="traceTable" class="rows"></div>
+          </div>
+        </section>
+
+        <!-- ABAJO DERECHA: objetos activos -->
+        <section class="objcol">
+          <div class="card bcard" id="objCard">
+            <div class="card-t"><i data-ico="route"></i>Objetos activos <span class="badge-n blue" id="activeCount">0</span></div>
+            <div id="activePeople" class="obj-wrap"><div class="empty-box">Sin objetos en cuadro todavía.</div></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
