@@ -35,6 +35,20 @@ Todo eso está en las cámaras que ya hay. OMNI Logistics lo saca.
 
 ## Cómo funciona
 
+<a href="docs/flujo.svg">
+  <img src="docs/flujo.svg" alt="De la cámara del almacén a la operación" width="100%">
+</a>
+
+<sub>Ábrelo en grande: <a href="docs/flujo.svg"><code>docs/flujo.svg</code></a>.
+Las cifras de las tarjetas no están escritas a mano — las pone
+<a href="scripts/diagrama.py"><code>scripts/diagrama.py</code></a> leyendo
+<code>docs/modelos.json</code>, que a su vez genera
+<a href="scripts/medir_modelos.py"><code>scripts/medir_modelos.py</code></a>
+midiendo los modelos de verdad. Si mañana se cambia un modelo, se corren los
+dos y el dibujo se corrige solo.</sub>
+
+### El mismo recorrido, en corto
+
 ```mermaid
 flowchart LR
   V["Video de almacén"] --> P["Lector de fotogramas"]
@@ -65,15 +79,43 @@ Exigir además brillo alto dentro de la caja quita casi todos los falsos
 positivos. Es la diferencia entre una alarma que se atiende y una que en una
 semana nadie mira.
 
-### Los modelos, y por qué esos
+<!-- MODELOS:inicio -->
 
-| Modelo | Para qué | De dónde |
-|---|---|---|
-| `pallet_n_640.pt` | Pallets | YOLO11n afinado con pallets de madera a 640 px |
-| `forklift_kerem.pt` | Montacargas y personas | YOLOv8m de keremberke |
-| `fire_smoke.pt` | Fuego y humo | YOLOv8n, con el filtro de brillo encima |
-| `ppe_vest.pt` | Chaleco y casco | Detector de EPP, para marcar infracciones |
-| `yolo11n.pt` | Base genérica | El único con URL pública |
+### Los modelos, medidos
+
+| Modelo | Para qué | Entrada | Precisión | Recall | mAP@50 | mAP@50-95 |
+|---|---|---|---|---|---|---|
+| **`pallet_n_640.pt`** | Pallets | 640² | 65.8 % | 61.4 % | 67.4 % | 57.1 % |
+| **`forklift_kerem.pt`** | Montacargas y personas | 640² | — | — | — | — |
+| **`fire_smoke.pt`** | Fuego y humo | 640² | 77.5 % | 69.5 % | 76.5 % | 44.5 % |
+| **`ppe_vest.pt`** | Chaleco y casco | 640² | — | — | — | — |
+| **`yolo11n.pt`** | Base genérica | 640² | 65.6 % | 50.2 % | 55.1 % | 39.4 % |
+
+<sub>Estas cuatro columnas **no** se calculan aquí: salen del propio archivo `.pt`, donde Ultralytics guarda la validación del entrenamiento que produjo esos pesos. Son el acierto sobre el conjunto de validación de quien lo entrenó, **no** sobre los videos de este proyecto. Medir eso exigiría etiquetar a mano esta operación concreta, que es trabajo que un MVP todavía no ha hecho; dar un porcentaje inventado sería peor que no darlo. Comprobación de que la lectura es correcta: `yolo11n` sale con mAP@50-95 = 39,4 % y Ultralytics publica 39,5 % para ese modelo en COCO.</sub>
+
+### De dónde sale cada modelo
+
+| Modelo | Entrenado sobre | Épocas | Resolución | Origen |
+|---|---|---|---|---|
+| **`pallet_n_640.pt`** | `data` | 100 | 640×640 | YOLO11n afinado con pallets de madera |
+| **`forklift_kerem.pt`** | `data` | 40 | 640×640 | [keremberke · forklift](https://huggingface.co/keremberke/yolov8m-forklift-detection) |
+| **`fire_smoke.pt`** | `data` | 50 | 640×640 | YOLOv8n afinado con fuego y humo |
+| **`ppe_vest.pt`** | `ppe_data` | 100 | 640×640 | Detector de EPP de terceros |
+| **`yolo11n.pt`** | `coco` | 600 | 640×640 | [Ultralytics · COCO 2017](https://docs.ultralytics.com/models/yolo11/) |
+
+<sub>El conjunto, las épocas y la resolución salen de `train_args`, que Ultralytics guarda dentro del propio `.pt`. Es decir: no es lo que dice la documentación del modelo, es lo que quedó grabado en el archivo que este repositorio usa de verdad. Los nombres de conjunto son los del disco de quien entrenó —`retrain_data`, `safe_human`— porque es literalmente lo que hay dentro.</sub>
+
+| Modelo | Parámetros | Clases | Latencia (mejor) | Latencia (mediana) | Det./fotograma | Confianza media |
+|---|---|---|---|---|---|---|
+| **`pallet_n_640.pt`** | 2.6 M | 1 | 14.8 ms · 68 fps | 17.6 ms · 56.7 fps | 0.3 | 0.453 |
+| **`forklift_kerem.pt`** | 25.9 M | 2 | 16.5 ms · 61 fps | 19.7 ms · 50.7 fps | 4.5 | 0.681 |
+| **`fire_smoke.pt`** | 3.0 M | 2 | 27.9 ms · 36 fps | 40.1 ms · 24.9 fps | 1.2 | 0.54 |
+| **`ppe_vest.pt`** | 3.0 M | 10 | 24.8 ms · 40 fps | 37.5 ms · 26.6 fps | 1.4 | 0.585 |
+| **`yolo11n.pt`** | 2.6 M | 80 | 15.7 ms · 64 fps | 18.5 ms · 54.2 fps | 0.9 | 0.482 |
+
+<sub>Esto sí se mide aquí, con <a href="scripts/medir_modelos.py"><code>scripts/medir_modelos.py</code></a>, sobre fotogramas reales de los videos del repositorio, en una RTX 3060 Laptop y a la resolución que usa la aplicación. Sesenta fotogramas, descartando los veinte primeros.<br>Se dan <b>dos</b> latencias a propósito. Esta GPU está a 210 MHz en reposo y tarda segundos en subir de reloj, así que la mediana se mueve bastante entre pasadas —el mismo <code>yolo11n</code> ha dado 20 y 48 fps— mientras que el mejor caso es estable y representa lo que la máquina puede sostener. Dar solo la cifra buena sería vender de más; dar solo la mediana, castigar al modelo por la gestión de energía del portátil.</sub>
+
+<!-- MODELOS:fin -->
 
 ## Probarlo
 

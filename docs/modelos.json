@@ -1,0 +1,168 @@
+[
+  {
+    "archivo": "pallet_n_640.pt",
+    "rol": "Pallets",
+    "umbral": 0.35,
+    "imgsz": 640,
+    "epochs": 100,
+    "dataset": "data",
+    "licencia": "AGPL-3.0 (https://ultralytics.com/license)",
+    "metricas": {
+      "precision": 0.6582,
+      "recall": 0.6137,
+      "mAP50": 0.6739,
+      "mAP50-95": 0.5708
+    },
+    "parametros": 2590035,
+    "clases": 1,
+    "nombres": [
+      "pallet"
+    ],
+    "video": "almacen_racks_720.mp4",
+    "res": 640,
+    "dispositivo": "cuda",
+    "ms": 17.6,
+    "fps": 56.7,
+    "dets": 0.3,
+    "conf_media": 0.453,
+    "mejor_ms": 14.8,
+    "fuente": [
+      "YOLO11n afinado con pallets de madera",
+      null
+    ]
+  },
+  {
+    "archivo": "forklift_kerem.pt",
+    "rol": "Montacargas y personas",
+    "umbral": 0.35,
+    "imgsz": 640,
+    "epochs": 40,
+    "dataset": "data",
+    "licencia": null,
+    "metricas": {},
+    "parametros": 25857478,
+    "clases": 2,
+    "nombres": [
+      "forklift",
+      "person"
+    ],
+    "video": "forklift_almacen_720.mp4",
+    "res": 640,
+    "dispositivo": "cuda",
+    "ms": 19.7,
+    "fps": 50.7,
+    "dets": 4.5,
+    "conf_media": 0.681,
+    "mejor_ms": 16.5,
+    "fuente": [
+      "keremberke · forklift",
+      "https://huggingface.co/keremberke/yolov8m-forklift-detection"
+    ]
+  },
+  {
+    "archivo": "fire_smoke.pt",
+    "rol": "Fuego y humo",
+    "umbral": 0.35,
+    "imgsz": 640,
+    "epochs": 50,
+    "dataset": "data",
+    "licencia": "AGPL-3.0 (https://ultralytics.com/license)",
+    "metricas": {
+      "precision": 0.7753,
+      "recall": 0.6945,
+      "mAP50": 0.765,
+      "mAP50-95": 0.4446
+    },
+    "parametros": 3011238,
+    "clases": 2,
+    "nombres": [
+      "smoke",
+      "fire"
+    ],
+    "video": "fuego_test.mp4",
+    "res": 640,
+    "dispositivo": "cuda",
+    "ms": 40.1,
+    "fps": 24.9,
+    "dets": 1.2,
+    "conf_media": 0.54,
+    "mejor_ms": 27.9,
+    "fuente": [
+      "YOLOv8n afinado con fuego y humo",
+      null
+    ]
+  },
+  {
+    "archivo": "ppe_vest.pt",
+    "rol": "Chaleco y casco",
+    "umbral": 0.35,
+    "imgsz": 640,
+    "epochs": 100,
+    "dataset": "ppe_data",
+    "licencia": null,
+    "metricas": {},
+    "parametros": 3012798,
+    "clases": 10,
+    "nombres": [
+      "Hardhat",
+      "Mask",
+      "NO-Hardhat",
+      "NO-Mask",
+      "NO-Safety Vest",
+      "Person",
+      "Safety Cone",
+      "Safety Vest"
+    ],
+    "video": "forklift_almacen_720.mp4",
+    "res": 640,
+    "dispositivo": "cuda",
+    "ms": 37.5,
+    "fps": 26.6,
+    "dets": 1.4,
+    "conf_media": 0.585,
+    "mejor_ms": 24.8,
+    "fuente": [
+      "Detector de EPP de terceros",
+      null
+    ]
+  },
+  {
+    "archivo": "yolo11n.pt",
+    "rol": "Base genérica",
+    "umbral": 0.35,
+    "imgsz": 640,
+    "epochs": 600,
+    "dataset": "coco",
+    "licencia": "AGPL-3.0 License (https://ultralytics.com/license)",
+    "metricas": {
+      "precision": 0.6564,
+      "recall": 0.5025,
+      "mAP50": 0.5514,
+      "mAP50-95": 0.394
+    },
+    "parametros": 2624080,
+    "clases": 80,
+    "nombres": [
+      "person",
+      "bicycle",
+      "car",
+      "motorcycle",
+      "airplane",
+      "bus",
+      "train",
+      "truck"
+    ],
+    "video": "almacen_racks_720.mp4",
+    "res": 640,
+    "dispositivo": "cuda",
+    "ms": 18.5,
+    "fps": 54.2,
+    "dets": 0.9,
+    "conf_media": 0.482,
+    "mejor_ms": 15.7,
+    "fuente": [
+      "Ultralytics · COCO 2017",
+      "https://docs.ultralytics.com/models/yolo11/"
+    ]
+  }
+]
