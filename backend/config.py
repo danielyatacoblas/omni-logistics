@@ -71,7 +71,7 @@ class Config:
 
     # ── servidor ──
     host: str = os.getenv("HOST", "0.0.0.0")
-    port: int = _i("PORT", 8020)
+    port: int = _i("PORT", 8021)
     videos_dir: str = os.getenv("VIDEOS_DIR", "videos")
     data_dir: str = os.getenv("DATA_DIR", "data")
 
