@@ -7,7 +7,9 @@
 > ![pruebas](https://img.shields.io/badge/pruebas-8%20pasando-129A6B)
 > ![licencia](https://img.shields.io/badge/uso-interno%20ApexCorp-E19100)
 
-![OMNI Logistics en marcha](docs/capturas/01-ocupacion.png)
+<p align="center">
+  <img src="docs/portada.svg" alt="OMNI Logistics: de la cámara del almacén a saber cuánto queda libre" width="100%">
+</p>
 
 ## El problema
 
