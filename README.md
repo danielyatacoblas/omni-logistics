@@ -151,7 +151,7 @@ salir bien.
 
 ## Cómo se trabajó
 
-**7 commits**, **4 fusiones** y **2 etiquetas** (`v0.1.0`, `v0.2.0`). Cada rama entra con `--no-ff`: un merge aplastado ahorra una línea y borra la única prueba de que aquello fue una tarea con principio y final.
+**10 commits**, **6 fusiones** y **3 etiquetas** (`v0.1.0`, `v0.2.0`, `v0.3.0`). al generar este bloque. Cada rama entra con `--no-ff`: un merge aplastado ahorra una línea y borra la única prueba de que aquello fue una tarea con principio y final.
 
 ```mermaid
 gitGraph
@@ -173,12 +173,20 @@ gitGraph
    merge feature/project-setup-and-tests
    checkout main
    merge develop tag: "v0.2.0"
+   checkout develop
+   branch feature/documentation-and-own-port
+   checkout feature/documentation-and-own-port
+   commit
+   checkout develop
+   merge feature/documentation-and-own-port
+   checkout main
+   merge develop tag: "v0.3.0"
 ```
 
 | Prefijo | Para qué | Ramas |
 |---|---|---|
-| `feature/` | trabajo acotado, se integra en develop | 2 |
-| `develop/` | rama de integración | 2 |
+| `feature/` | trabajo acotado, se integra en develop | 3 |
+| `develop/` | rama de integración | 3 |
 
 | Rama | Responsabilidad | Regla de salida |
 |---|---|---|
